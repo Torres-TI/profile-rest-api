@@ -12,21 +12,20 @@ class UserProfileManager(BaseUserManager):
         if not email:
             raise ValueError("User must have an email address")
 
-        email = self.normalize(email)
+        email = self.normalize_email(email)
         user = self.model(email=email, name=name)
 
         user.set_password(password)
-        user.save(using=self_db)
+        user.save(using=self._db)
+        return user 
 
-    def create_super_user(self, email, name, password):
+    def create_superuser(self, email, name, password):
         """Create and save a new superuser with given details"""
-
         user = self.create_user(email, name, password)
         user.is_staff = True
         user.is_superuser = True
 
-        user.save(using=self_db)
-
+        user.save(using=self._db)
         return user
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
@@ -47,6 +46,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         """Retriee short name of the customer"""
-
+        return self.name
     def __str__(self):
         return self.email
